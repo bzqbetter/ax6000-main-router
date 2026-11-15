@@ -10,4 +10,4 @@ Builds `xiaomi_redmi-router-ax6000-mtkuboot` from
 - LAN `192.168.5.1`, IPv6 off, firewall flow offloading forced off (conflicts with mtk_hnat)
 
 Run: Actions -> "Build Redmi AX6000 firmware" -> Run workflow. Images land in the run's artifacts.
-Flash only the `*-mtkuboot-squashfs-sysupgrade.itb` file.
+Flash only the `*-mtkuboot-squashfs-sysupgrade.bin` file (sysupgrade tar, board `xiaomi,redmi-router-ax6000-mtkuboot`).
