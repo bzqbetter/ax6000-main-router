@@ -99,8 +99,16 @@ ls -lh files/etc/openclash files/etc/openclash/core
 
 # ---- Config ----
 log "Config"
-cp "$HERE/ax6000.config" .config
+# Base: the fork's own AX6000 defconfig (carries ~100 MTK Wi-Fi/WARP/conninfra chip options),
+# reduced to a single-device build; then our overrides (later assignments win in kconfig).
+grep -vE '^CONFIG_TARGET_(MULTI_PROFILE|PER_DEVICE_ROOTFS|DEVICE_)' defconfig/mt7986-ax6000.config > .config
+cat "$HERE/ax6000.config" >> .config
 make defconfig
+grep -q '^CONFIG_TARGET_mediatek_filogic_DEVICE_xiaomi_redmi-router-ax6000-mtkuboot=y' .config \
+  || { echo "Device profile not selected"; exit 1; }
+for opt in MTK_CONNINFRA_APSOC_MT7986 MTK_CHIP_MT7986 MTK_FIRST_IF_MT7986; do
+  grep -q "^CONFIG_${opt}=y" .config || { echo "MTK option missing: CONFIG_$opt"; exit 1; }
+done
 
 missing=0
 for p in luci-app-homeproxy sing-box luci-app-openclash luci-theme-argon luci-app-argon-config \
