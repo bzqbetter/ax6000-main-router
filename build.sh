@@ -105,6 +105,9 @@ done
 for p in odhcp6c odhcpd-ipv6only luci-app-sqm https-dns-proxy; do
   if grep -q "^CONFIG_PACKAGE_${p}=y" .config; then echo "NOTE: $p still selected (pulled by a dependency)"; fi
 done
+for opt in RUBY_ENABLE_YJIT SING_BOX_BUILD_NAIVE_OUTBOUND PACKAGE_rust; do
+  grep -q "^CONFIG_${opt}=y" .config && { echo "UNWANTED: CONFIG_$opt=y (breaks the build)"; missing=1; }
+done
 [ "$missing" = 0 ] || { echo "Fix the packages above before building."; exit 1; }
 
 # ---- Build ----
