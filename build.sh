@@ -45,6 +45,11 @@ git -C /tmp/pkgs-master sparse-checkout set net/sing-box
 cp -r /tmp/pkgs-master/net/sing-box feeds/packages/net/sing-box && rm -rf /tmp/pkgs-master
 sed -i -e "s/^PKG_VERSION:=.*/PKG_VERSION:=$SINGBOX_VER/" -e "s/^PKG_RELEASE:=.*/PKG_RELEASE:=1/" \
        -e "s/^PKG_HASH:=.*/PKG_HASH:=$SINGBOX_HASH/" feeds/packages/net/sing-box/Makefile
+# NaiveProxy outbound is a promptless "def_bool y" that needs libcronet (Chromium net stack,
+# not in the 25.12 feed). Turn the default off so .config can't re-enable it.
+sed -i '/config SING_BOX_BUILD_NAIVE_OUTBOUND/{n;s/def_bool y/def_bool n/}' feeds/packages/net/sing-box/Makefile
+grep -A1 'config SING_BOX_BUILD_NAIVE_OUTBOUND' feeds/packages/net/sing-box/Makefile | grep -q 'def_bool n' \
+  || { echo "Failed to disable sing-box naive outbound"; exit 1; }
 
 ./scripts/feeds update -i
 ./scripts/feeds install -a
